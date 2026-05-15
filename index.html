@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kasir POM MINI Pro</title>
-    <!-- Tailwind CSS (Diasumsikan tersedia sesuai instruksi system, fallback CDN ditambahkan untuk preview standalone) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -64,7 +64,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-darkbg dark:text-gray-100 transition-colors duration-300 pb-20 md:pb-0 h-screen overflow-hidden flex">
 
-    <!-- Sidebar (Desktop) / Hidden on Mobile -->
+    <!-- Sidebar (Desktop) -->
     <aside class="hidden md:flex flex-col w-64 h-full bg-white dark:bg-darkcard shadow-lg z-20">
         <div class="p-6 font-bold text-2xl text-primary flex items-center gap-2">
             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
@@ -130,13 +130,13 @@
                         </div>
                         <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white" id="dash-revenue">Rp 0</h3>
                     </div>
-                    <!-- Profit -->
+                    <!-- Profit Bersih -->
                     <div class="bg-white dark:bg-darkcard p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                         <div class="flex items-center gap-3 mb-2">
-                            <div class="p-2 bg-green-100 dark:bg-green-900/30 text-success rounded-lg">
+                            <div class="p-2 bg-green-100 dark:bg-green-900/30 text-success rounded-lg" id="icon-profit-bg">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                             </div>
-                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Profit Hari Ini</span>
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Profit Bersih Hari Ini</span>
                         </div>
                         <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white" id="dash-profit">Rp 0</h3>
                     </div>
@@ -158,7 +158,7 @@
                             </div>
                             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Pengeluaran</span>
                         </div>
-                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white" id="dash-expense">Rp 0</h3>
+                        <h3 class="text-xl md:text-2xl font-bold text-danger" id="dash-expense">Rp 0</h3>
                     </div>
                 </div>
 
@@ -166,7 +166,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Chart Section -->
                     <div class="lg:col-span-2 bg-white dark:bg-darkcard p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-                        <h3 class="font-bold text-lg mb-4">Grafik Penjualan (7 Hari Terakhir)</h3>
+                        <h3 class="font-bold text-lg mb-4">Grafik Pemasukan (7 Hari Terakhir)</h3>
                         <div class="h-48 flex items-end justify-between gap-2 border-b border-gray-200 dark:border-gray-700 pb-2 relative" id="sales-chart">
                             <!-- Bars injected by JS -->
                         </div>
@@ -177,7 +177,7 @@
 
                     <!-- Side Info -->
                     <div class="space-y-4">
-                        <!-- Harga Aktif -->
+                        <!-- Harga & Saldo Aktif -->
                         <div class="bg-primary text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
                             <div class="absolute top-0 right-0 p-4 opacity-20">
                                 <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
@@ -185,18 +185,21 @@
                             <h3 class="font-medium text-blue-100 mb-1">Harga Jual Aktif</h3>
                             <div class="text-2xl font-bold mb-4" id="info-sell">Rp 0/L</div>
                             
-                            <h3 class="font-medium text-blue-100 mb-1">Modal Harian</h3>
+                            <h3 class="font-medium text-blue-100 mb-1">Harga Modal</h3>
                             <div class="text-xl font-semibold mb-4" id="info-modal">Rp 0/L</div>
 
-                            <h3 class="font-medium text-blue-100 mb-1">Sisa Stok BBM</h3>
-                            <div class="text-xl font-semibold" id="info-stock">0 Liter</div>
+                            <h3 class="font-medium text-blue-100 mb-1">Sisa Saldo Modal BBM</h3>
+                            <div class="text-xl font-semibold" id="info-stock">Rp 0</div>
                         </div>
 
-                        <!-- Est Keuntungan -->
-                        <div class="bg-white dark:bg-darkcard p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-                            <h3 class="font-medium text-gray-500 dark:text-gray-400 mb-1">Estimasi Profit Bulan Ini</h3>
-                            <div class="text-xl font-bold text-success" id="dash-est-profit">Rp 0</div>
-                            <p class="text-xs text-gray-400 mt-2">*Berdasarkan rata-rata harian</p>
+                        <!-- Profit Bulanan Aktual -->
+                        <div class="bg-white dark:bg-darkcard p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden">
+                            <div class="absolute right-0 bottom-0 opacity-5 dark:opacity-10 pointer-events-none">
+                                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                            </div>
+                            <h3 class="font-medium text-gray-500 dark:text-gray-400 mb-1" id="label-month-profit">Profit Bersih Bulan Ini</h3>
+                            <div class="text-2xl font-bold" id="dash-net-month">Rp 0</div>
+                            <p class="text-xs text-gray-400 mt-2">(Total Omset - Total Modal - Total Pengeluaran)</p>
                         </div>
                     </div>
                 </div>
@@ -249,11 +252,11 @@
                         
                         <div class="grid grid-cols-2 gap-4 border-t border-gray-700 pt-6">
                             <div>
-                                <p class="text-gray-400 text-sm">Modal Terpakai</p>
+                                <p class="text-gray-400 text-sm">Potongan Saldo Modal</p>
                                 <p class="text-2xl font-bold text-gray-100" id="live-modal">Rp 0</p>
                             </div>
                             <div>
-                                <p class="text-gray-400 text-sm">Keuntungan</p>
+                                <p class="text-gray-400 text-sm">Gross Profit</p>
                                 <p class="text-2xl font-bold text-success" id="live-profit">Rp 0</p>
                             </div>
                         </div>
@@ -290,7 +293,7 @@
                                     <th class="p-4 font-medium">Jam/Tgl</th>
                                     <th class="p-4 font-medium">Nominal</th>
                                     <th class="p-4 font-medium">Liter</th>
-                                    <th class="p-4 font-medium">Profit</th>
+                                    <th class="p-4 font-medium">Gross Profit</th>
                                     <th class="p-4 font-medium hidden md:table-cell">Catatan</th>
                                     <th class="p-4 font-medium text-right">Aksi</th>
                                 </tr>
@@ -301,7 +304,7 @@
                         </table>
                     </div>
 
-                    <!-- Container Pengeluaran (Include Form inside Tab) -->
+                    <!-- Container Pengeluaran -->
                     <div id="container-pengeluaran" class="hidden">
                         <div class="p-4 border-b border-gray-100 dark:border-gray-800 bg-red-50 dark:bg-red-900/10">
                             <h3 class="font-bold text-danger mb-3">Input Pengeluaran Baru</h3>
@@ -353,19 +356,19 @@
                             </div>
                         </div>
                         <button onclick="saveSettings()" class="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition">Simpan Harga</button>
-                        <p class="text-xs text-gray-400 mt-2">*Perubahan harga tidak akan merubah data riwayat penjualan sebelumnya.</p>
                     </div>
 
-                    <!-- Stok BBM Settings -->
+                    <!-- Stok Modal Settings -->
                     <div class="bg-white dark:bg-darkcard p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                         <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-orange-500">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                            Manajemen Stok BBM
+                            Manajemen Saldo Modal BBM (Rp)
                         </h3>
+                        <p class="text-sm text-gray-500 mb-4">Inputkan total nominal Rupiah saat Anda berbelanja stok/mengisi drum bensin. Saldo akan dipotong sesuai harga modal terjual.</p>
                         <div class="flex items-end gap-4">
                             <div class="flex-1">
-                                <label class="block text-sm font-medium text-gray-500 mb-1">Tambah Stok (Liter)</label>
-                                <input type="number" id="add-stock" class="w-full p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0">
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Tambah Saldo Modal (Rp)</label>
+                                <input type="number" id="add-stock" class="w-full p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Contoh: 500000">
                             </div>
                             <button onclick="updateStock()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition">Tambah</button>
                         </div>
@@ -444,13 +447,11 @@
             settings: {
                 modal: 10000,
                 sell: 12000,
-                stock: 0
+                stock: 0 // Sekarang diukur sebagai Total Rupiah Saldo Modal
             }
         };
 
         let appData = JSON.parse(localStorage.getItem('pomMiniData')) || DEFAULT_STATE;
-
-        // Ensure new properties exist on old devices
         if (!appData.settings.stock) appData.settings.stock = 0;
 
         // --- Core Functions ---
@@ -474,19 +475,15 @@
 
         // --- Navigation ---
         function nav(page) {
-            // Hide all pages
             document.querySelectorAll('.page-view').forEach(el => {
                 el.classList.add('hidden');
                 el.classList.remove('fade-in');
             });
-            // Show target
             const target = document.getElementById('view-' + page);
             target.classList.remove('hidden');
-            // Retrigger animation
             void target.offsetWidth; 
             target.classList.add('fade-in');
 
-            // Update Desktop Nav Styling
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('text-primary', 'bg-blue-50', 'dark:bg-gray-800');
                 btn.classList.add('text-gray-500');
@@ -497,7 +494,6 @@
                 dBtn.classList.remove('text-gray-500');
             }
 
-            // Update Mobile Nav Styling
             document.querySelectorAll('.glass-nav button').forEach(btn => {
                 if(btn.id !== 'nav-m-kasir') {
                     btn.classList.remove('text-primary');
@@ -510,7 +506,6 @@
                 mBtn.classList.remove('text-gray-400');
             }
 
-            // Page specific executions
             if(page === 'dashboard') updateDashboard();
             if(page === 'riwayat') renderHistory();
             if(page === 'pengaturan') loadSettings();
@@ -524,54 +519,89 @@
             localStorage.setItem('pomMiniTheme', isDark ? 'dark' : 'light');
         }
         
-        // Init theme
         if (localStorage.getItem('pomMiniTheme') === 'dark' || (!('pomMiniTheme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         }
 
         // --- Dashboard Logic ---
         function updateDashboard() {
-            document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const now = new Date();
+            document.getElementById('dashboard-date').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
-            const today = new Date().toISOString().split('T')[0];
-            let revToday = 0, profitToday = 0, literToday = 0, expToday = 0;
-            let revYesterday = 0, profitYesterday = 0;
+            const todayStr = now.toISOString().split('T')[0];
+            const currentMonthStr = todayStr.substring(0, 7); 
+            
+            const monthName = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+            document.getElementById('label-month-profit').textContent = `Profit Bersih ${monthName}`;
 
-            const yesterdayDate = new Date();
-            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-            const yesterday = yesterdayDate.toISOString().split('T')[0];
+            let revToday = 0, cogsToday = 0, expToday = 0, literToday = 0;
+            let revMonth = 0, cogsMonth = 0, expMonth = 0;
 
             appData.sales.forEach(s => {
                 const sDate = s.date.split('T')[0];
-                if (sDate === today) {
+                const sMonth = s.date.substring(0, 7);
+
+                if (sDate === todayStr) {
                     revToday += s.amount;
-                    profitToday += s.profit;
+                    cogsToday += s.modalUsed;
                     literToday += s.liters;
                 }
-                if (sDate === yesterday) {
-                    revYesterday += s.amount;
-                    profitYesterday += s.profit;
+                if (sMonth === currentMonthStr) {
+                    revMonth += s.amount;
+                    cogsMonth += s.modalUsed;
                 }
             });
 
             appData.expenses.forEach(e => {
-                if (e.date.split('T')[0] === today) {
+                const eDate = e.date.split('T')[0];
+                const eMonth = e.date.substring(0, 7);
+
+                if (eDate === todayStr) {
                     expToday += e.amount;
+                }
+                if (eMonth === currentMonthStr) {
+                    expMonth += e.amount;
                 }
             });
 
+            // Rumus Profit Bersih: Omset - Modal Terpakai - Pengeluaran
+            const netProfitToday = (revToday - cogsToday) - expToday;
+            const netProfitMonth = (revMonth - cogsMonth) - expMonth;
+
+            // Update UI Hari Ini
             document.getElementById('dash-revenue').textContent = formatRp(revToday);
-            document.getElementById('dash-profit').textContent = formatRp(profitToday);
             document.getElementById('dash-liters').textContent = literToday.toFixed(2) + ' L';
             document.getElementById('dash-expense').textContent = formatRp(expToday);
+            
+            const profitEl = document.getElementById('dash-profit');
+            profitEl.textContent = formatRp(netProfitToday);
+            if(netProfitToday < 0) {
+                profitEl.classList.remove('text-gray-800', 'dark:text-white');
+                profitEl.classList.add('text-danger');
+            } else {
+                profitEl.classList.add('text-gray-800', 'dark:text-white');
+                profitEl.classList.remove('text-danger');
+            }
 
+            // Update UI Bulan Ini
+            const monthProfitEl = document.getElementById('dash-net-month');
+            monthProfitEl.textContent = formatRp(netProfitMonth);
+            if(netProfitMonth < 0) {
+                monthProfitEl.classList.remove('text-success');
+                monthProfitEl.classList.add('text-danger');
+            } else {
+                monthProfitEl.classList.add('text-success');
+                monthProfitEl.classList.remove('text-danger');
+            }
+
+            // Info Aktif
             document.getElementById('info-sell').textContent = formatRp(appData.settings.sell) + '/L';
             document.getElementById('info-modal').textContent = formatRp(appData.settings.modal) + '/L';
             
-            // Stock styling
+            // Stock styling (Sekarang menampilkan RUPIAH Saldo Modal)
             const stockEl = document.getElementById('info-stock');
-            stockEl.textContent = appData.settings.stock.toFixed(2) + ' Liter';
-            if(appData.settings.stock < 20) {
+            stockEl.textContent = formatRp(appData.settings.stock);
+            if(appData.settings.stock < 100000) { // Warning if modal under 100k IDR
                 stockEl.classList.add('text-red-300');
                 stockEl.classList.remove('text-blue-100');
             } else {
@@ -579,28 +609,12 @@
                 stockEl.classList.add('text-blue-100');
             }
 
-            // Estimate Monthly Profit (Based on average of this month)
-            const currentMonth = today.substring(0, 7);
-            let monthProfit = 0;
-            let daysWithSales = new Set();
-            appData.sales.forEach(s => {
-                if (s.date.startsWith(currentMonth)) {
-                    monthProfit += s.profit;
-                    daysWithSales.add(s.date.split('T')[0]);
-                }
-            });
-            const avgDaily = daysWithSales.size > 0 ? (monthProfit / daysWithSales.size) : 0;
-            document.getElementById('dash-est-profit').textContent = formatRp(avgDaily * 30);
-
             // Alerts
             const alertCont = document.getElementById('alert-container');
             alertCont.innerHTML = '';
             
-            if (appData.settings.stock < 20) {
-                alertCont.innerHTML += `<div class="bg-red-100 border-l-4 border-danger text-danger p-3 rounded shadow-sm text-sm font-semibold flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Peringatan: Stok BBM hampir habis (${appData.settings.stock.toFixed(2)} L)</div>`;
-            }
-            if (profitToday < profitYesterday && yesterdayDate.getHours() < 23) {
-               // alertCont.innerHTML += `<div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 rounded shadow-sm text-sm font-semibold flex items-center gap-2">Trend profit hari ini menurun dibandingkan kemarin.</div>`;
+            if (appData.settings.stock < 100000) {
+                alertCont.innerHTML += `<div class="bg-red-100 border-l-4 border-danger text-danger p-3 rounded shadow-sm text-sm font-semibold flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Peringatan: Saldo Modal BBM hampir habis (${formatRp(appData.settings.stock)})</div>`;
             }
 
             renderChart();
@@ -612,7 +626,6 @@
             chartCont.innerHTML = '';
             labelCont.innerHTML = '';
 
-            // Get last 7 days stats
             let chartData = [];
             let maxVal = 0;
             for(let i=6; i>=0; i--) {
@@ -629,10 +642,9 @@
                 chartData.push({ label: dayLabel, val: daySales });
             }
 
-            // Draw bars
             chartData.forEach(item => {
                 const heightPct = maxVal === 0 ? 0 : (item.val / maxVal) * 100;
-                // Bar
+                
                 const barWrapper = document.createElement('div');
                 barWrapper.className = 'w-1/7 flex flex-col justify-end items-center group relative h-full w-full mx-1';
                 
@@ -641,7 +653,6 @@
                 bar.style.height = `${heightPct}%`;
                 bar.style.minHeight = '4px';
 
-                // Tooltip
                 const tooltip = document.createElement('div');
                 tooltip.className = 'absolute -top-8 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10 pointer-events-none';
                 tooltip.textContent = formatRp(item.val);
@@ -650,7 +661,6 @@
                 barWrapper.appendChild(bar);
                 chartCont.appendChild(barWrapper);
 
-                // Label
                 const lbl = document.createElement('div');
                 lbl.className = 'w-1/7 text-center w-full';
                 lbl.textContent = item.label;
@@ -667,11 +677,11 @@
             if (sell > 0) {
                 const liters = val / sell;
                 const modalUsed = liters * modal;
-                const profit = val - modalUsed;
+                const grossProfit = val - modalUsed;
 
                 document.getElementById('live-liters').innerHTML = `${liters.toFixed(2)} <span class="text-3xl text-gray-300 font-semibold">L</span>`;
                 document.getElementById('live-modal').textContent = formatRp(modalUsed);
-                document.getElementById('live-profit').textContent = formatRp(profit);
+                document.getElementById('live-profit').textContent = formatRp(grossProfit);
             }
         }
 
@@ -689,7 +699,6 @@
         }
 
         function fillFullTank() {
-            // Prompts user for exact nominal since full tank varies
             const amt = prompt("Masukkan total nominal uang (Full Tank):", "");
             if(amt && !isNaN(amt)) {
                 document.getElementById('input-nominal').value = amt;
@@ -714,15 +723,15 @@
             }
 
             const liters = val / sell;
+            const modalUsed = liters * modal;
             
-            // Check stock
-            if(appData.settings.stock < liters) {
-                if(!confirm(`Stok tersisa (${appData.settings.stock.toFixed(2)} L) kurang dari penjualan (${liters.toFixed(2)} L). Tetap lanjutkan dan biarkan stok minus?`)) {
+            // Check modal stock
+            if(appData.settings.stock < modalUsed) {
+                if(!confirm(`Sisa Saldo Modal (${formatRp(appData.settings.stock)}) kurang dari modal transaksi ini (${formatRp(modalUsed)}). Tetap lanjutkan?`)) {
                     return;
                 }
             }
 
-            const modalUsed = liters * modal;
             const profit = val - modalUsed;
 
             const sale = {
@@ -736,7 +745,8 @@
             };
 
             appData.sales.push(sale);
-            appData.settings.stock -= liters; // Reduce stock
+            // Deduct Rupiah based modal used
+            appData.settings.stock -= modalUsed;
 
             saveData();
             clearNominal();
@@ -747,11 +757,9 @@
         function setTabRiwayat(tab) {
             const isPenj = tab === 'penjualan';
             
-            // Toggle containers
             document.getElementById('container-penjualan').classList.toggle('hidden', !isPenj);
             document.getElementById('container-pengeluaran').classList.toggle('hidden', isPenj);
             
-            // Toggle active classes
             const activeClass = ['bg-white', 'dark:bg-gray-700', 'shadow', 'text-gray-800', 'dark:text-white'];
             const inactiveClass = ['text-gray-500', 'hover:text-gray-800', 'dark:text-gray-400', 'dark:hover:text-gray-200'];
             
@@ -776,7 +784,7 @@
             const tbodyS = document.getElementById('table-sales');
             tbodyS.innerHTML = '';
             
-            let filteredSales = appData.sales.slice().reverse(); // Newest first
+            let filteredSales = appData.sales.slice().reverse();
             if(filterDate) {
                 filteredSales = filteredSales.filter(s => s.date.startsWith(filterDate));
             }
@@ -838,9 +846,9 @@
         }
 
         function deleteSale(id) {
-            if(confirm('Hapus transaksi penjualan ini? Stok akan dikembalikan.')) {
+            if(confirm('Hapus transaksi penjualan ini? Saldo modal akan dikembalikan.')) {
                 const sale = appData.sales.find(s => s.id === id);
-                if(sale) appData.settings.stock += sale.liters; // Revert stock
+                if(sale) appData.settings.stock += sale.modalUsed; // Revert Rupiah
                 appData.sales = appData.sales.filter(s => s.id !== id);
                 saveData();
                 renderHistory();
@@ -902,16 +910,16 @@
         function updateStock() {
             const add = parseFloat(document.getElementById('add-stock').value);
             if(add > 0) {
-                appData.settings.stock += add;
+                appData.settings.stock += add; // Menambahkan Modal dalam hitungan Rupiah
                 saveData();
                 document.getElementById('add-stock').value = '';
-                showToast(`Stok bertambah ${add} Liter`, 'success');
+                showToast(`Saldo Modal bertambah ${formatRp(add)}`, 'success');
             }
         }
 
         // --- Backup, Restore, Export ---
         function exportCSV() {
-            let csv = "Tanggal,Waktu,Nominal,Liter,Modal Terpakai,Profit,Catatan\n";
+            let csv = "Tanggal,Waktu,Nominal,Liter,Modal Terpakai,Gross Profit,Catatan\n";
             appData.sales.forEach(s => {
                 const d = new Date(s.date);
                 const date = d.toLocaleDateString('id-ID');
@@ -988,7 +996,7 @@
                         <th style="padding:8px 0;">Waktu</th>
                         <th style="padding:8px 0;">Nominal</th>
                         <th style="padding:8px 0;">Liter</th>
-                        <th style="padding:8px 0;">Profit</th>
+                        <th style="padding:8px 0;">Gross Profit</th>
                     </tr>
                 </thead>
                 <tbody>`;
@@ -1011,7 +1019,7 @@
             <div style="margin-top:20px; border-top:2px solid #000; padding-top:10px;">
                 <strong>Total Pemasukan:</strong> ${formatRp(totalVal)} <br>
                 <strong>Total Liter:</strong> ${totalLiters.toFixed(2)} L <br>
-                <strong>Total Profit:</strong> ${formatRp(totalProfit)}
+                <strong>Total Profit Kotor:</strong> ${formatRp(totalProfit)}
             </div>`;
 
             printArea.innerHTML = html;
@@ -1020,9 +1028,10 @@
 
         // Init First Load
         nav('dashboard');
-        
-        // Auto-set date filter to today on init
         document.getElementById('filter-date').value = new Date().toISOString().split('T')[0];
     </script>
 </body>
 </html>
+
+
+```
