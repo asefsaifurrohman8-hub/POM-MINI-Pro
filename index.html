@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kasir POM MINI Pro</title>
+    <!-- Tailwind CSS (Diasumsikan tersedia sesuai instruksi system, fallback CDN ditambahkan untuk preview standalone) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0073FE',
+                        success: '#9FE400',
+                        danger: '#FD0017',
+                        darkbg: '#121212',
+                        darkcard: '#1E1E1E'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styling & Custom Scrollbar */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background-color: #475569; }
+        
+        /* Animations */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .slide-up { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* Toast Notifications */
+        #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+        .toast { padding: 1rem; border-radius: 0.5rem; color: white; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.1); opacity: 0; transform: translateX(100%); animation: toastEnter 0.3s forwards, toastLeave 0.3s 2.7s forwards; }
+        .toast.success { background-color: #9FE400; color: #1f2937; }
+        .toast.danger { background-color: #FD0017; }
+        .toast.primary { background-color: #0073FE; }
+        @keyframes toastEnter { to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastLeave { to { opacity: 0; transform: translateX(100%); } }
+
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+
+        /* Glassmorphism for Bottom Nav */
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid #f1f5f9; }
+        .dark .glass-nav { background: rgba(30, 30, 30, 0.9); border-top: 1px solid #333; }
+
+        /* Hide Number Input Arrows */
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-darkbg dark:text-gray-100 transition-colors duration-300 pb-20 md:pb-0 h-screen overflow-hidden flex">
+
+    <!-- Sidebar (Desktop) / Hidden on Mobile -->
+    <aside class="hidden md:flex flex-col w-64 h-full bg-white dark:bg-darkcard shadow-lg z-20">
+        <div class="p-6 font-bold text-2xl text-primary flex items-center gap-2">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            POM MINI
+        </div>
+        <nav class="flex-1 px-4 space-y-2">
+            <button onclick="nav('dashboard')" id="nav-d-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-left hover:bg-blue-50 dark:hover:bg-gray-800 text-primary bg-blue-50 dark:bg-gray-800 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </button>
+            <button onclick="nav('kasir')" id="nav-d-kasir" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-left hover:bg-blue-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Kasir
+            </button>
+            <button onclick="nav('riwayat')" id="nav-d-riwayat" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-left hover:bg-blue-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Riwayat
+            </button>
+            <button onclick="nav('pengaturan')" id="nav-d-pengaturan" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-left hover:bg-blue-50 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Pengaturan
+            </button>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+        <!-- Topbar Mobile -->
+        <header class="md:hidden flex items-center justify-between p-4 bg-white dark:bg-darkcard shadow-sm z-10">
+            <h1 class="font-bold text-xl text-primary">POM MINI Pro</h1>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-gray-100 dark:bg-gray-800">
+                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </header>
+
+        <!-- Container Pages -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8" id="page-container">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="page-view fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Dashboard</h2>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm" id="dashboard-date"></p>
+                    </div>
+                    <button onclick="toggleDarkMode()" class="hidden md:block p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 transition">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Alerts -->
+                <div id="alert-container" class="mb-4 space-y-2"></div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <!-- Pemasukan -->
+                    <div class="bg-white dark:bg-darkcard p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-primary rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Pemasukan Hari Ini</span>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white" id="dash-revenue">Rp 0</h3>
+                    </div>
+                    <!-- Profit -->
+                    <div class="bg-white dark:bg-darkcard p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-2 bg-green-100 dark:bg-green-900/30 text-success rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Profit Hari Ini</span>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white" id="dash-profit">Rp 0</h3>
+                    </div>
+                    <!-- Liter -->
+                    <div class="bg-white dark:bg-darkcard p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-2 bg-orange-100 dark:bg-orange-900/30 text-orange-500 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Liter Terjual</span>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white" id="dash-liters">0 L</h3>
+                    </div>
+                    <!-- Pengeluaran -->
+                    <div class="bg-white dark:bg-darkcard p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-2 bg-red-100 dark:bg-red-900/30 text-danger rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Pengeluaran</span>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white" id="dash-expense">Rp 0</h3>
+                    </div>
+                </div>
+
+                <!-- Chart & Info Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Chart Section -->
+                    <div class="lg:col-span-2 bg-white dark:bg-darkcard p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h3 class="font-bold text-lg mb-4">Grafik Penjualan (7 Hari Terakhir)</h3>
+                        <div class="h-48 flex items-end justify-between gap-2 border-b border-gray-200 dark:border-gray-700 pb-2 relative" id="sales-chart">
+                            <!-- Bars injected by JS -->
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-gray-500" id="chart-labels">
+                            <!-- Labels injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Side Info -->
+                    <div class="space-y-4">
+                        <!-- Harga Aktif -->
+                        <div class="bg-primary text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-20">
+                                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            </div>
+                            <h3 class="font-medium text-blue-100 mb-1">Harga Jual Aktif</h3>
+                            <div class="text-2xl font-bold mb-4" id="info-sell">Rp 0/L</div>
+                            
+                            <h3 class="font-medium text-blue-100 mb-1">Modal Harian</h3>
+                            <div class="text-xl font-semibold mb-4" id="info-modal">Rp 0/L</div>
+
+                            <h3 class="font-medium text-blue-100 mb-1">Sisa Stok BBM</h3>
+                            <div class="text-xl font-semibold" id="info-stock">0 Liter</div>
+                        </div>
+
+                        <!-- Est Keuntungan -->
+                        <div class="bg-white dark:bg-darkcard p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                            <h3 class="font-medium text-gray-500 dark:text-gray-400 mb-1">Estimasi Profit Bulan Ini</h3>
+                            <div class="text-xl font-bold text-success" id="dash-est-profit">Rp 0</div>
+                            <p class="text-xs text-gray-400 mt-2">*Berdasarkan rata-rata harian</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: KASIR -->
+            <div id="view-kasir" class="page-view fade-in hidden">
+                <h2 class="text-2xl font-bold mb-6">Kasir Penjualan</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Kalkulator Card -->
+                    <div class="bg-white dark:bg-darkcard p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Nominal Pembayaran (Rp)</label>
+                            <input type="number" id="input-nominal" class="w-full text-4xl font-bold p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition" placeholder="0" oninput="calculateLive()">
+                        </div>
+                        
+                        <!-- Quick Buttons -->
+                        <div class="grid grid-cols-3 gap-3 mb-6">
+                            <button onclick="addNominal(5000)" class="py-3 bg-blue-50 dark:bg-gray-800 text-primary dark:text-blue-400 font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-gray-700 transition">5K</button>
+                            <button onclick="addNominal(10000)" class="py-3 bg-blue-50 dark:bg-gray-800 text-primary dark:text-blue-400 font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-gray-700 transition">10K</button>
+                            <button onclick="addNominal(15000)" class="py-3 bg-blue-50 dark:bg-gray-800 text-primary dark:text-blue-400 font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-gray-700 transition">15K</button>
+                            <button onclick="addNominal(20000)" class="py-3 bg-blue-50 dark:bg-gray-800 text-primary dark:text-blue-400 font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-gray-700 transition">20K</button>
+                            <button onclick="addNominal(25000)" class="py-3 bg-blue-50 dark:bg-gray-800 text-primary dark:text-blue-400 font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-gray-700 transition">25K</button>
+                            <button onclick="addNominal(50000)" class="py-3 bg-blue-50 dark:bg-gray-800 text-primary dark:text-blue-400 font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-gray-700 transition">50K</button>
+                            <button onclick="addNominal(100000)" class="py-3 bg-blue-50 dark:bg-gray-800 text-primary dark:text-blue-400 font-semibold rounded-xl hover:bg-blue-100 dark:hover:bg-gray-700 transition">100K</button>
+                            <button onclick="fillFullTank()" class="py-3 bg-purple-50 dark:bg-gray-800 text-purple-600 dark:text-purple-400 font-semibold rounded-xl hover:bg-purple-100 dark:hover:bg-gray-700 transition">Full Tank</button>
+                            <button onclick="clearNominal()" class="py-3 bg-red-50 dark:bg-gray-800 text-danger font-semibold rounded-xl hover:bg-red-100 dark:hover:bg-gray-700 transition">Clear (C)</button>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Catatan (Opsional)</label>
+                            <input type="text" id="input-note" class="w-full p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Misal: Motor Vario Plat B...">
+                        </div>
+
+                        <button onclick="processSale()" class="w-full py-4 bg-primary text-white text-xl font-bold rounded-xl shadow-lg hover:bg-blue-600 transition transform active:scale-95 flex justify-center items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            SIMPAN PENJUALAN
+                        </button>
+                    </div>
+
+                    <!-- Live Calculation Card -->
+                    <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-lg flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 opacity-10">
+                            <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        </div>
+                        
+                        <h3 class="text-gray-400 font-medium mb-2 uppercase tracking-wider text-sm">Estimasi Keluar BBM</h3>
+                        <div class="text-6xl font-black text-success mb-8" id="live-liters">0.00 <span class="text-3xl text-gray-300 font-semibold">L</span></div>
+                        
+                        <div class="grid grid-cols-2 gap-4 border-t border-gray-700 pt-6">
+                            <div>
+                                <p class="text-gray-400 text-sm">Modal Terpakai</p>
+                                <p class="text-2xl font-bold text-gray-100" id="live-modal">Rp 0</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-400 text-sm">Keuntungan</p>
+                                <p class="text-2xl font-bold text-success" id="live-profit">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: RIWAYAT -->
+            <div id="view-riwayat" class="page-view fade-in hidden">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                    <h2 class="text-2xl font-bold">Riwayat Transaksi</h2>
+                    
+                    <!-- Tabs -->
+                    <div class="flex bg-gray-200 dark:bg-gray-800 p-1 rounded-xl w-full md:w-auto">
+                        <button onclick="setTabRiwayat('penjualan')" id="tab-penjualan" class="flex-1 md:px-6 py-2 rounded-lg bg-white dark:bg-gray-700 shadow text-sm font-semibold transition">Penjualan</button>
+                        <button onclick="setTabRiwayat('pengeluaran')" id="tab-pengeluaran" class="flex-1 md:px-6 py-2 rounded-lg text-gray-500 dark:text-gray-400 text-sm font-semibold hover:text-gray-800 dark:hover:text-gray-200 transition">Pengeluaran</button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-darkcard rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+                        <input type="date" id="filter-date" onchange="renderHistory()" class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                        <button onclick="printReport()" class="text-primary hover:text-blue-700 font-medium text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                            Cetak
+                        </button>
+                    </div>
+
+                    <!-- Container Penjualan -->
+                    <div id="container-penjualan" class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-sm">
+                                    <th class="p-4 font-medium">Jam/Tgl</th>
+                                    <th class="p-4 font-medium">Nominal</th>
+                                    <th class="p-4 font-medium">Liter</th>
+                                    <th class="p-4 font-medium">Profit</th>
+                                    <th class="p-4 font-medium hidden md:table-cell">Catatan</th>
+                                    <th class="p-4 font-medium text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-sales" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                                <!-- Data injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Container Pengeluaran (Include Form inside Tab) -->
+                    <div id="container-pengeluaran" class="hidden">
+                        <div class="p-4 border-b border-gray-100 dark:border-gray-800 bg-red-50 dark:bg-red-900/10">
+                            <h3 class="font-bold text-danger mb-3">Input Pengeluaran Baru</h3>
+                            <div class="flex flex-col md:flex-row gap-3">
+                                <input type="text" id="exp-name" placeholder="Nama Pengeluaran (Cth: Beli Bensin, Makan)" class="flex-1 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none">
+                                <input type="number" id="exp-amount" placeholder="Nominal Rp" class="flex-1 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none">
+                                <button onclick="saveExpense()" class="bg-danger text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Simpan</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-sm">
+                                        <th class="p-4 font-medium">Tanggal</th>
+                                        <th class="p-4 font-medium">Pengeluaran</th>
+                                        <th class="p-4 font-medium">Nominal</th>
+                                        <th class="p-4 font-medium text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-expenses" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                                    <!-- Data injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: PENGATURAN -->
+            <div id="view-pengaturan" class="page-view fade-in hidden max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Pengaturan Sistem</h2>
+
+                <div class="space-y-6">
+                    <!-- Harga BBM Settings -->
+                    <div class="bg-white dark:bg-darkcard p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-primary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Pengaturan Harga BBM
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Harga Modal per Liter (Rp)</label>
+                                <input type="number" id="set-modal" class="w-full p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Harga Jual per Liter (Rp)</label>
+                                <input type="number" id="set-sell" class="w-full p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                        </div>
+                        <button onclick="saveSettings()" class="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition">Simpan Harga</button>
+                        <p class="text-xs text-gray-400 mt-2">*Perubahan harga tidak akan merubah data riwayat penjualan sebelumnya.</p>
+                    </div>
+
+                    <!-- Stok BBM Settings -->
+                    <div class="bg-white dark:bg-darkcard p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-orange-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            Manajemen Stok BBM
+                        </h3>
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Tambah Stok (Liter)</label>
+                                <input type="number" id="add-stock" class="w-full p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0">
+                            </div>
+                            <button onclick="updateStock()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition">Tambah</button>
+                        </div>
+                    </div>
+
+                    <!-- Database Management -->
+                    <div class="bg-white dark:bg-darkcard p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">Backup & Restore Data</h3>
+                        <p class="text-sm text-gray-500 mb-4">Simpan data Anda sebagai file backup agar aman, atau pindahkan ke perangkat lain.</p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <button onclick="exportCSV()" class="p-3 border border-gray-200 dark:border-gray-700 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm font-medium text-green-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Export CSV
+                            </button>
+                            <button onclick="backupJSON()" class="p-3 border border-gray-200 dark:border-gray-700 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm font-medium text-blue-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                Backup (.json)
+                            </button>
+                        </div>
+                        
+                        <div class="border-t border-gray-100 dark:border-gray-800 pt-4 mt-2">
+                            <label class="block text-sm font-medium text-gray-500 mb-2">Restore Data dari File (.json)</label>
+                            <input type="file" id="restore-file" accept=".json" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-800 dark:file:text-blue-400">
+                            <button onclick="restoreJSON()" class="mt-3 w-full py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">Mulai Restore</button>
+                        </div>
+
+                        <div class="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4 text-center">
+                            <button onclick="resetData()" class="text-sm text-danger hover:underline font-medium">Reset Semua Data (Hapus Permanen)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End of Page Container -->
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="glass-nav md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center z-50 pb-safe">
+        <button onclick="nav('dashboard')" id="nav-m-dashboard" class="flex flex-col items-center p-3 text-primary transition">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span class="text-[10px] font-medium">Home</span>
+        </button>
+        <button onclick="nav('kasir')" id="nav-m-kasir" class="flex flex-col items-center p-3 text-gray-400 hover:text-primary transition">
+            <div class="bg-primary text-white p-3 rounded-full -mt-8 shadow-lg shadow-blue-500/30 transform active:scale-95 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <span class="text-[10px] font-medium mt-1 text-primary">Kasir</span>
+        </button>
+        <button onclick="nav('riwayat')" id="nav-m-riwayat" class="flex flex-col items-center p-3 text-gray-400 hover:text-primary transition">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="text-[10px] font-medium">Riwayat</span>
+        </button>
+        <button onclick="nav('pengaturan')" id="nav-m-pengaturan" class="flex flex-col items-center p-3 text-gray-400 hover:text-primary transition">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="text-[10px] font-medium">Setelan</span>
+        </button>
+    </nav>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Hidden Printable Area -->
+    <div id="print-area" class="hidden print:block bg-white text-black p-8">
+        <h2 class="text-2xl font-bold text-center mb-2">Laporan POM MINI</h2>
+        <p class="text-center mb-6" id="print-date"></p>
+        <div id="print-content"></div>
+    </div>
+
+    <!-- Logic Script -->
+    <script>
+        // --- State Management ---
+        const DEFAULT_STATE = {
+            sales: [],
+            expenses: [],
+            settings: {
+                modal: 10000,
+                sell: 12000,
+                stock: 0
+            }
+        };
+
+        let appData = JSON.parse(localStorage.getItem('pomMiniData')) || DEFAULT_STATE;
+
+        // Ensure new properties exist on old devices
+        if (!appData.settings.stock) appData.settings.stock = 0;
+
+        // --- Core Functions ---
+        function saveData() {
+            localStorage.setItem('pomMiniData', JSON.stringify(appData));
+            updateDashboard();
+        }
+
+        function formatRp(amount) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+
+        // --- Navigation ---
+        function nav(page) {
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('fade-in');
+            });
+            // Show target
+            const target = document.getElementById('view-' + page);
+            target.classList.remove('hidden');
+            // Retrigger animation
+            void target.offsetWidth; 
+            target.classList.add('fade-in');
+
+            // Update Desktop Nav Styling
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-primary', 'bg-blue-50', 'dark:bg-gray-800');
+                btn.classList.add('text-gray-500');
+            });
+            const dBtn = document.getElementById('nav-d-' + page);
+            if(dBtn) {
+                dBtn.classList.add('text-primary', 'bg-blue-50', 'dark:bg-gray-800');
+                dBtn.classList.remove('text-gray-500');
+            }
+
+            // Update Mobile Nav Styling
+            document.querySelectorAll('.glass-nav button').forEach(btn => {
+                if(btn.id !== 'nav-m-kasir') {
+                    btn.classList.remove('text-primary');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+            const mBtn = document.getElementById('nav-m-' + page);
+            if(mBtn && mBtn.id !== 'nav-m-kasir') {
+                mBtn.classList.add('text-primary');
+                mBtn.classList.remove('text-gray-400');
+            }
+
+            // Page specific executions
+            if(page === 'dashboard') updateDashboard();
+            if(page === 'riwayat') renderHistory();
+            if(page === 'pengaturan') loadSettings();
+        }
+
+        // --- Dark Mode ---
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('pomMiniTheme', isDark ? 'dark' : 'light');
+        }
+        
+        // Init theme
+        if (localStorage.getItem('pomMiniTheme') === 'dark' || (!('pomMiniTheme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // --- Dashboard Logic ---
+        function updateDashboard() {
+            document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            const today = new Date().toISOString().split('T')[0];
+            let revToday = 0, profitToday = 0, literToday = 0, expToday = 0;
+            let revYesterday = 0, profitYesterday = 0;
+
+            const yesterdayDate = new Date();
+            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+            const yesterday = yesterdayDate.toISOString().split('T')[0];
+
+            appData.sales.forEach(s => {
+                const sDate = s.date.split('T')[0];
+                if (sDate === today) {
+                    revToday += s.amount;
+                    profitToday += s.profit;
+                    literToday += s.liters;
+                }
+                if (sDate === yesterday) {
+                    revYesterday += s.amount;
+                    profitYesterday += s.profit;
+                }
+            });
+
+            appData.expenses.forEach(e => {
+                if (e.date.split('T')[0] === today) {
+                    expToday += e.amount;
+                }
+            });
+
+            document.getElementById('dash-revenue').textContent = formatRp(revToday);
+            document.getElementById('dash-profit').textContent = formatRp(profitToday);
+            document.getElementById('dash-liters').textContent = literToday.toFixed(2) + ' L';
+            document.getElementById('dash-expense').textContent = formatRp(expToday);
+
+            document.getElementById('info-sell').textContent = formatRp(appData.settings.sell) + '/L';
+            document.getElementById('info-modal').textContent = formatRp(appData.settings.modal) + '/L';
+            
+            // Stock styling
+            const stockEl = document.getElementById('info-stock');
+            stockEl.textContent = appData.settings.stock.toFixed(2) + ' Liter';
+            if(appData.settings.stock < 20) {
+                stockEl.classList.add('text-red-300');
+                stockEl.classList.remove('text-blue-100');
+            } else {
+                stockEl.classList.remove('text-red-300');
+                stockEl.classList.add('text-blue-100');
+            }
+
+            // Estimate Monthly Profit (Based on average of this month)
+            const currentMonth = today.substring(0, 7);
+            let monthProfit = 0;
+            let daysWithSales = new Set();
+            appData.sales.forEach(s => {
+                if (s.date.startsWith(currentMonth)) {
+                    monthProfit += s.profit;
+                    daysWithSales.add(s.date.split('T')[0]);
+                }
+            });
+            const avgDaily = daysWithSales.size > 0 ? (monthProfit / daysWithSales.size) : 0;
+            document.getElementById('dash-est-profit').textContent = formatRp(avgDaily * 30);
+
+            // Alerts
+            const alertCont = document.getElementById('alert-container');
+            alertCont.innerHTML = '';
+            
+            if (appData.settings.stock < 20) {
+                alertCont.innerHTML += `<div class="bg-red-100 border-l-4 border-danger text-danger p-3 rounded shadow-sm text-sm font-semibold flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Peringatan: Stok BBM hampir habis (${appData.settings.stock.toFixed(2)} L)</div>`;
+            }
+            if (profitToday < profitYesterday && yesterdayDate.getHours() < 23) {
+               // alertCont.innerHTML += `<div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 rounded shadow-sm text-sm font-semibold flex items-center gap-2">Trend profit hari ini menurun dibandingkan kemarin.</div>`;
+            }
+
+            renderChart();
+        }
+
+        function renderChart() {
+            const chartCont = document.getElementById('sales-chart');
+            const labelCont = document.getElementById('chart-labels');
+            chartCont.innerHTML = '';
+            labelCont.innerHTML = '';
+
+            // Get last 7 days stats
+            let chartData = [];
+            let maxVal = 0;
+            for(let i=6; i>=0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                const dayLabel = d.toLocaleDateString('id-ID', { weekday: 'short' });
+                
+                let daySales = 0;
+                appData.sales.forEach(s => {
+                    if(s.date.split('T')[0] === dateStr) daySales += s.amount;
+                });
+                if(daySales > maxVal) maxVal = daySales;
+                chartData.push({ label: dayLabel, val: daySales });
+            }
+
+            // Draw bars
+            chartData.forEach(item => {
+                const heightPct = maxVal === 0 ? 0 : (item.val / maxVal) * 100;
+                // Bar
+                const barWrapper = document.createElement('div');
+                barWrapper.className = 'w-1/7 flex flex-col justify-end items-center group relative h-full w-full mx-1';
+                
+                const bar = document.createElement('div');
+                bar.className = 'w-full bg-primary rounded-t-sm transition-all duration-500 group-hover:bg-blue-400';
+                bar.style.height = `${heightPct}%`;
+                bar.style.minHeight = '4px';
+
+                // Tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'absolute -top-8 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10 pointer-events-none';
+                tooltip.textContent = formatRp(item.val);
+
+                barWrapper.appendChild(tooltip);
+                barWrapper.appendChild(bar);
+                chartCont.appendChild(barWrapper);
+
+                // Label
+                const lbl = document.createElement('div');
+                lbl.className = 'w-1/7 text-center w-full';
+                lbl.textContent = item.label;
+                labelCont.appendChild(lbl);
+            });
+        }
+
+        // --- Kasir Logic ---
+        function calculateLive() {
+            const val = parseFloat(document.getElementById('input-nominal').value) || 0;
+            const sell = appData.settings.sell;
+            const modal = appData.settings.modal;
+
+            if (sell > 0) {
+                const liters = val / sell;
+                const modalUsed = liters * modal;
+                const profit = val - modalUsed;
+
+                document.getElementById('live-liters').innerHTML = `${liters.toFixed(2)} <span class="text-3xl text-gray-300 font-semibold">L</span>`;
+                document.getElementById('live-modal').textContent = formatRp(modalUsed);
+                document.getElementById('live-profit').textContent = formatRp(profit);
+            }
+        }
+
+        function addNominal(amount) {
+            const input = document.getElementById('input-nominal');
+            const current = parseFloat(input.value) || 0;
+            input.value = current + amount;
+            calculateLive();
+        }
+
+        function clearNominal() {
+            document.getElementById('input-nominal').value = '';
+            document.getElementById('input-note').value = '';
+            calculateLive();
+        }
+
+        function fillFullTank() {
+            // Prompts user for exact nominal since full tank varies
+            const amt = prompt("Masukkan total nominal uang (Full Tank):", "");
+            if(amt && !isNaN(amt)) {
+                document.getElementById('input-nominal').value = amt;
+                document.getElementById('input-note').value = "Full Tank";
+                calculateLive();
+            }
+        }
+
+        function processSale() {
+            const val = parseFloat(document.getElementById('input-nominal').value);
+            const note = document.getElementById('input-note').value;
+            const sell = appData.settings.sell;
+            const modal = appData.settings.modal;
+
+            if (!val || val <= 0) {
+                showToast('Masukkan nominal dengan benar!', 'danger');
+                return;
+            }
+            if (sell <= 0 || modal <= 0) {
+                showToast('Harga jual/modal belum diatur di Pengaturan!', 'danger');
+                return;
+            }
+
+            const liters = val / sell;
+            
+            // Check stock
+            if(appData.settings.stock < liters) {
+                if(!confirm(`Stok tersisa (${appData.settings.stock.toFixed(2)} L) kurang dari penjualan (${liters.toFixed(2)} L). Tetap lanjutkan dan biarkan stok minus?`)) {
+                    return;
+                }
+            }
+
+            const modalUsed = liters * modal;
+            const profit = val - modalUsed;
+
+            const sale = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                amount: val,
+                liters: liters,
+                modalUsed: modalUsed,
+                profit: profit,
+                note: note
+            };
+
+            appData.sales.push(sale);
+            appData.settings.stock -= liters; // Reduce stock
+
+            saveData();
+            clearNominal();
+            showToast(`Berhasil! ${liters.toFixed(2)} L terjual.`, 'success');
+        }
+
+        // --- Riwayat Logic ---
+        function setTabRiwayat(tab) {
+            const isPenj = tab === 'penjualan';
+            
+            // Toggle containers
+            document.getElementById('container-penjualan').classList.toggle('hidden', !isPenj);
+            document.getElementById('container-pengeluaran').classList.toggle('hidden', isPenj);
+            
+            // Toggle active classes
+            const activeClass = ['bg-white', 'dark:bg-gray-700', 'shadow', 'text-gray-800', 'dark:text-white'];
+            const inactiveClass = ['text-gray-500', 'hover:text-gray-800', 'dark:text-gray-400', 'dark:hover:text-gray-200'];
+            
+            const btnPenj = document.getElementById('tab-penjualan');
+            const btnPeng = document.getElementById('tab-pengeluaran');
+
+            if(isPenj) {
+                btnPenj.classList.add(...activeClass); btnPenj.classList.remove(...inactiveClass);
+                btnPeng.classList.add(...inactiveClass); btnPeng.classList.remove(...activeClass);
+            } else {
+                btnPeng.classList.add(...activeClass); btnPeng.classList.remove(...inactiveClass);
+                btnPenj.classList.add(...inactiveClass); btnPenj.classList.remove(...activeClass);
+            }
+            
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const filterDate = document.getElementById('filter-date').value;
+            
+            // Render Penjualan
+            const tbodyS = document.getElementById('table-sales');
+            tbodyS.innerHTML = '';
+            
+            let filteredSales = appData.sales.slice().reverse(); // Newest first
+            if(filterDate) {
+                filteredSales = filteredSales.filter(s => s.date.startsWith(filterDate));
+            }
+
+            if(filteredSales.length === 0) {
+                tbodyS.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-gray-500">Tidak ada data.</td></tr>`;
+            } else {
+                filteredSales.forEach(s => {
+                    const d = new Date(s.date);
+                    const time = d.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 dark:hover:bg-gray-800/50 transition";
+                    tr.innerHTML = `
+                        <td class="p-4">${time} <span class="text-xs text-gray-400 block">${d.toLocaleDateString('id-ID')}</span></td>
+                        <td class="p-4 font-bold text-gray-800 dark:text-gray-200">${formatRp(s.amount)}</td>
+                        <td class="p-4">${s.liters.toFixed(2)} L</td>
+                        <td class="p-4 text-success font-semibold">${formatRp(s.profit)}</td>
+                        <td class="p-4 hidden md:table-cell text-gray-500">${s.note || '-'}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteSale(${s.id})" class="text-danger hover:text-red-700 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </td>
+                    `;
+                    tbodyS.appendChild(tr);
+                });
+            }
+
+            // Render Pengeluaran
+            const tbodyE = document.getElementById('table-expenses');
+            tbodyE.innerHTML = '';
+
+            let filteredExp = appData.expenses.slice().reverse();
+            if(filterDate) {
+                filteredExp = filteredExp.filter(e => e.date.startsWith(filterDate));
+            }
+
+            if(filteredExp.length === 0) {
+                tbodyE.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Tidak ada data.</td></tr>`;
+            } else {
+                filteredExp.forEach(e => {
+                    const d = new Date(e.date);
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 dark:hover:bg-gray-800/50 transition";
+                    tr.innerHTML = `
+                        <td class="p-4">${d.toLocaleDateString('id-ID')}</td>
+                        <td class="p-4 font-medium">${e.name}</td>
+                        <td class="p-4 text-danger font-semibold">${formatRp(e.amount)}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteExpense(${e.id})" class="text-danger hover:text-red-700 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </td>
+                    `;
+                    tbodyE.appendChild(tr);
+                });
+            }
+        }
+
+        function deleteSale(id) {
+            if(confirm('Hapus transaksi penjualan ini? Stok akan dikembalikan.')) {
+                const sale = appData.sales.find(s => s.id === id);
+                if(sale) appData.settings.stock += sale.liters; // Revert stock
+                appData.sales = appData.sales.filter(s => s.id !== id);
+                saveData();
+                renderHistory();
+                showToast('Transaksi dihapus', 'primary');
+            }
+        }
+
+        function saveExpense() {
+            const name = document.getElementById('exp-name').value;
+            const amount = parseFloat(document.getElementById('exp-amount').value);
+
+            if(!name || !amount || amount <= 0) {
+                showToast('Isi nama dan nominal dengan benar', 'danger');
+                return;
+            }
+
+            appData.expenses.push({
+                id: Date.now(),
+                date: new Date().toISOString(),
+                name: name,
+                amount: amount
+            });
+
+            saveData();
+            document.getElementById('exp-name').value = '';
+            document.getElementById('exp-amount').value = '';
+            renderHistory();
+            showToast('Pengeluaran ditambahkan', 'success');
+        }
+
+        function deleteExpense(id) {
+            if(confirm('Hapus data pengeluaran ini?')) {
+                appData.expenses = appData.expenses.filter(e => e.id !== id);
+                saveData();
+                renderHistory();
+            }
+        }
+
+        // --- Pengaturan Logic ---
+        function loadSettings() {
+            document.getElementById('set-modal').value = appData.settings.modal;
+            document.getElementById('set-sell').value = appData.settings.sell;
+        }
+
+        function saveSettings() {
+            const modal = parseFloat(document.getElementById('set-modal').value);
+            const sell = parseFloat(document.getElementById('set-sell').value);
+
+            if(modal > 0 && sell > 0) {
+                appData.settings.modal = modal;
+                appData.settings.sell = sell;
+                saveData();
+                showToast('Harga berhasil diubah', 'success');
+            } else {
+                showToast('Harga tidak valid', 'danger');
+            }
+        }
+
+        function updateStock() {
+            const add = parseFloat(document.getElementById('add-stock').value);
+            if(add > 0) {
+                appData.settings.stock += add;
+                saveData();
+                document.getElementById('add-stock').value = '';
+                showToast(`Stok bertambah ${add} Liter`, 'success');
+            }
+        }
+
+        // --- Backup, Restore, Export ---
+        function exportCSV() {
+            let csv = "Tanggal,Waktu,Nominal,Liter,Modal Terpakai,Profit,Catatan\n";
+            appData.sales.forEach(s => {
+                const d = new Date(s.date);
+                const date = d.toLocaleDateString('id-ID');
+                const time = d.toLocaleTimeString('id-ID');
+                csv += `"${date}","${time}","${s.amount}","${s.liters.toFixed(2)}","${s.modalUsed}","${s.profit}","${s.note}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Laporan_POM_MINI_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        function backupJSON() {
+            const dataStr = JSON.stringify(appData);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Backup_POM_MINI_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        function restoreJSON() {
+            const file = document.getElementById('restore-file').files[0];
+            if(!file) {
+                showToast('Pilih file backup .json terlebih dahulu', 'danger');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(data.sales && data.settings) {
+                        appData = data;
+                        saveData();
+                        nav('dashboard');
+                        showToast('Restore data berhasil!', 'success');
+                    } else {
+                        showToast('Format file tidak valid', 'danger');
+                    }
+                } catch(err) {
+                    showToast('Gagal membaca file', 'danger');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetData() {
+            if(confirm('PERINGATAN! Semua data penjualan, pengeluaran, dan pengaturan akan dihapus permanen. Lanjutkan?')) {
+                if(confirm('Ketik "OK" untuk menghapus permanen.')) {
+                    appData = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                    saveData();
+                    nav('dashboard');
+                    showToast('Sistem di-reset', 'primary');
+                }
+            }
+        }
+
+        function printReport() {
+            const filterDate = document.getElementById('filter-date').value;
+            const printArea = document.getElementById('print-content');
+            document.getElementById('print-date').textContent = filterDate ? `Tanggal: ${filterDate}` : `Semua Data Transaksi`;
+            
+            let totalVal = 0, totalLiters = 0, totalProfit = 0;
+            
+            let sales = appData.sales;
+            if(filterDate) sales = sales.filter(s => s.date.startsWith(filterDate));
+
+            let html = `<table style="width:100%; border-collapse:collapse; text-align:left;">
+                <thead>
+                    <tr style="border-bottom:2px solid #000;">
+                        <th style="padding:8px 0;">Waktu</th>
+                        <th style="padding:8px 0;">Nominal</th>
+                        <th style="padding:8px 0;">Liter</th>
+                        <th style="padding:8px 0;">Profit</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            sales.forEach(s => {
+                totalVal += s.amount;
+                totalLiters += s.liters;
+                totalProfit += s.profit;
+                html += `
+                    <tr style="border-bottom:1px solid #ddd;">
+                        <td style="padding:8px 0;">${new Date(s.date).toLocaleString('id-ID')}</td>
+                        <td style="padding:8px 0;">${formatRp(s.amount)}</td>
+                        <td style="padding:8px 0;">${s.liters.toFixed(2)}</td>
+                        <td style="padding:8px 0;">${formatRp(s.profit)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>
+            <div style="margin-top:20px; border-top:2px solid #000; padding-top:10px;">
+                <strong>Total Pemasukan:</strong> ${formatRp(totalVal)} <br>
+                <strong>Total Liter:</strong> ${totalLiters.toFixed(2)} L <br>
+                <strong>Total Profit:</strong> ${formatRp(totalProfit)}
+            </div>`;
+
+            printArea.innerHTML = html;
+            window.print();
+        }
+
+        // Init First Load
+        nav('dashboard');
+        
+        // Auto-set date filter to today on init
+        document.getElementById('filter-date').value = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>
